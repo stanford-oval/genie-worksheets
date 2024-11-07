@@ -115,7 +115,7 @@ How can I help you today?
     #knowledge_base=suql_knowledge, — TODO
     #knowledge_parser=suql_parser, — TODO
 ).load_from_gsheet(
-    gsheet_id="TODO", # TODO
+    gsheet_id="12fiyfwVRN5IHh_qIZnN7FfonB4lzkBvhUtedXzdur0k", # TODO
 )
 
 # Run the conversation loop
