@@ -1,5 +1,17 @@
+import asyncio
+import os
+import random
+from uuid import uuid4
 import requests
 
+from suql.agent import postprocess_suql
+
+from worksheets.agent import Agent
+from worksheets.environment import get_genie_fields_from_ws
+from worksheets.interface_utils import conversation_loop
+from worksheets.knowledge import SUQLKnowledgeBase, SUQLParser, SUQLReActParser
+
+# Define your APIs
 class AdoptionSearch:
     def __init__(self):
         self.base_url = 'https://api-staging.adoptapet.com/search/'
@@ -75,4 +87,36 @@ class AdoptionSearch:
             return response.json()
         else:
             response.raise_for_status()
-    
+
+adoption_search_client = AdoptionSearch()
+
+# Define path to the prompts
+
+current_dir = os.path.dirname(os.path.realpath(__file__))
+prompt_dir = os.path.join(current_dir, "prompts")
+
+# Define Knowledge Base
+# TODO - define knowledge base
+
+# Define the agent
+dog_adoption_bot = Agent(
+    botname="Dog Adoption Assistant",
+    description="You are a dog adoptionassistant. You can help future dog owners with deciding a dog breed suited to their needs and finding nearby adoption postings",
+    prompt_dir=prompt_dir,
+    starting_prompt="""Hello! I'm the Dog Adoption Assistant. I can help you with :
+- Finding a suitable dog breed: just say find me dog breeds
+- Searching for dog adoption listings nearby. 
+- Asking me any question related to dog breeds and adopting a new dog.
+
+How can I help you today? 
+""",
+    args={},
+    api=[adoption_search_client.get_matching_breeds, adoption_search_client.get_pet_details],
+    #knowledge_base=suql_knowledge, — TODO
+    #knowledge_parser=suql_parser, — TODO
+).load_from_gsheet(
+    gsheet_id="TODO", # TODO
+)
+
+# Run the conversation loop
+asyncio.run(conversation_loop(dog_adoption_bot, "dog_adoption_bot.json"))
