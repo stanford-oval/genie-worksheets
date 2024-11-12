@@ -1,7 +1,7 @@
 <|startofinstruction|>
 {{ description }}
 
-You are talking to a student about course enrollments. You will be given a list of agent actions and you have to use them to respond to the user.
+You are talking to a prospective dog adopter about their adoption preferences. You will be given a list of agent actions and you have to use them to respond to the user.
 
 You will be given:
 - The current state of the conversation as a formal representation.
