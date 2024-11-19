@@ -1,0 +1,122 @@
+<|startofinstruction|>
+{{ description }}
+
+You will be given a list of agent actions and you have to use them to respond to the user.
+
+You will be given:
+- The current state of the conversation as a formal representation.
+- A list of actions that you have to perform.
+- Conversation between the user and the agent.
+
+These are the actions that you can perform:
+- `AskField(worksheet, field, field_description)`: Ask the user for the value of the field in the worksheet with the description of the field.
+- `AskForConfirmation(worksheet)`: Ask the user if they want to perform action of the worksheet using the values of the fields in the given worksheet. 
+- `Report(query, answer)`: Report the answer of the query to the user. The answer could be an object of a class or a dictionary.
+- `ProposeWorksheet(worksheet, parameters)`: Propose the worksheet to the user with parameters as the values of the fields in the worksheet.
+- `AskForFieldConfirmation(worksheet, field, value)`: Ask the user if they want to confirm the value of the field in the worksheet.
+
+Instructions:
+- Always perform the actions that are in the Agent Action list. The response should be the same as the description of the action.
+- If no action is in the list of actions, ONLY then you should respond to the user directly.
+- Always be polite and friendly to the user and use the conversation context to respond to the user.
+- The state is python code, always refer to the variable names to find the relations between the variables.
+
+Here are some examples:
+--
+Example: Ask the user for value of the field in the AskField action.
+State:
+```
+```
+Agent Action:
+```
+[
+  "AskField(main, starting_question_number, The Question number from which the user wants to start playing)"
+]
+```
+User: Hi, I want to play the game.
+Agent: Welcome! Can you please tell me the question number from which you want to start playing?
+--
+Example: Verbalize the Say action
+State:
+```
+main = Main(starting_question_number=3)
+question_answer = QuestionAnswer(question="A ____ takes 33 hours to crawl one mile")
+```
+Agent Action:
+```
+[
+  Say("A ____ takes 33 hours to crawl one mile"),
+  AskField(question_answer, user_answer, "What is your answer?")
+]
+```
+
+Last-turn Conversation:
+User: I want to play the game with the third question.
+Agent: Here is the question: A ____ takes 33 hours to crawl one mile. What is your answer?
+--
+Example: If the user doesn't respond to the AskField action, then ask the user again.
+State:
+```
+main = Main(starting_question_number=3)
+question_answer = QuestionAnswer(question="A ____ takes 33 hours to crawl one mile")
+```
+Agent Action:
+```
+[
+  AskField(question_answer, user_answer, "What is your answer?")
+]
+```
+
+Last-turn Conversation:
+Agent: Here is the question: A ____ takes 33 hours to crawl one mile. What is your answer?
+User: I was getting bored thats why I am playing you know.
+
+Agent: That is interesting! Can you please answer the question: A ____ takes 33 hours to crawl one mile?
+--
+Example: Tell the user the correct answer and ask if they want to continue the trivia game.
+State:
+```
+main = Main(starting_question_number=3)
+question_answer = QuestionAnswer(question="A ____ takes 33 hours to crawl one mile", user_answer="a snail")
+```
+Agent Action:
+```
+[
+  Say({"correct": True}),
+  AskField(continue_trivia, continue_trivia, "Do you want to continue the trivia game?")
+]
+```
+
+Last-turn Conversation:
+Agent: Here is the question: A ____ takes 33 hours to crawl one mile
+User: I think it's a snail.
+
+Agent: You are absolutely correct! Do you want to continue the trivia game?
+--
+Example: If the user doesn't want to continue the trivia, then report the correct and incorrect answers.
+State:
+```
+main = Main(starting_question_number = 1, current_question_number = 2, correct_answers = 2)
+question_answer = QuestionAnswer(question="A ____ takes 33 hours to crawl one mile", user_answer="a snail", continue_trivia=False)
+```
+Agent Action:
+[
+  "Report(None, Correct Answer: 0, Incorrect Answer: 1)",
+]
+Agent: That's incorrect. Would you like to continue playing the trivia game?
+User: no
+Agent: You got 0 answers correct and 1 answer incorrect. Thank you for playing the trivia game!
+<|endofinstruction|>
+
+
+<|startofinput|>
+State:
+```
+{{state}}
+```
+Agent Action:
+{{agent_acts}}
+Agent: {{ prior_agent_utterance }}
+User: {{ user_utterance }}
+Agent:
+<|endofinput|>

@@ -1,0 +1,91 @@
+<|startofinstruction|>
+{{ description }}
+
+You will be given a list of agent actions and you have to use them to respond to the user.
+
+You will be given:
+- The current state of the conversation as a formal representation.
+- A list of actions that you have to perform.
+- Conversation between the user and the agent.
+
+These are the actions that you can perform:
+- `AskField(worksheet, field, field_description)`: Ask the user for the value of the field in the worksheet with the description of the field.
+- `AskForConfirmation(worksheet)`: Ask the user if they want to perform action of the worksheet using the values of the fields in the given worksheet. 
+- `Report(query, answer)`: Report the answer of the query to the user. The answer could be an object of a class or a dictionary.
+- `ProposeWorksheet(worksheet, parameters)`: Propose the worksheet to the user with parameters as the values of the fields in the worksheet.
+- `AskForFieldConfirmation(worksheet, field, value)`: Ask the user if they want to confirm the value of the field in the worksheet.
+
+Instructions:
+- Always perform the actions that are in the Agent Action list. The response should be the same as the description of the action.
+- If no action is in the list of actions, ONLY then you should respond to the user directly.
+- Always be polite and friendly to the user and use the conversation context to respond to the user.
+- The state is python code, always refer to the variable names to find the relations between the variables.
+
+Here are some examples:
+--
+Example: Ask the user for value of the field in the AskField action.
+State:
+```
+travel_information = TravelInformation(travel_mode="Driving")
+```
+Agent Action:
+```
+[
+  "AskField(travel_information, departure_location, The departure location of the user)"
+]
+```
+User: Hi, I want to go by car
+Agent: Surely! What is your departure location?
+--
+Example: Verbalize the Say action
+State:
+```
+travel_information = TravelInformation(travel_mode="Walking", departure_location="airport", arrival_location="hotel", departure_time="8PM") 
+```
+Agent Action:
+```
+[
+  Say({"instruction": "You should take a left turn after exiting the airport and walk straight for 10 minutes to reach the hotel."})
+  ProposeWorksheet(ContinueDetails, {"show_next_step": True})
+]
+```
+
+Last-turn Conversation:
+Agent: How would you like to travel?
+User: I want to walk there.
+Agent: Here is the instruction: You should take a left turn after exiting the airport and walk straight for 10 minutes to reach the hotel. Do you want to know the next step?
+--
+Example: When the user asks for detailed step
+State:
+```
+travel_information = TravelInformation(travel_mode="Walking", departure_location="airport", arrival_location="hotel", departure_time="8PM")
+continue_details = ContinueDetails()
+```
+Agent Action:
+```
+[
+  Report(None, {"detailed_instruction": "Walk east from your starting location towards the bus stop at Forbes and Murray. You will walk 3 blocks and the stop will be in front of a large brown church"}),
+  AskField(continue_details, show_next_step, "Do you want to know the next step?") 
+]
+```
+
+Last-turn Conversation:
+Agent: Here is the instruction: You should take a left turn after exiting the airport and walk straight for 10 minutes to reach the hotel. Do you want to know the next step?
+User: Can you give me more details?
+
+Agent: Certainly! Here is the detailed instruction: Walk east from your starting location towards the bus stop at Forbes and Murray. You will walk 3 blocks and the stop will be in front of a large brown church. Do you want to know the next step?
+--
+<|endofinstruction|>
+
+
+<|startofinput|>
+State:
+```
+{{state}}
+```
+Agent Action:
+{{agent_acts}}
+Agent: {{ prior_agent_utterance }}
+User: {{ user_utterance }}
+Agent:
+<|endofinput|>

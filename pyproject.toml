@@ -21,6 +21,7 @@ dependencies = [
     "grandalf>=0.8",
     "langchain-openai>=0.1.7",
     "langchain-together>=0.1.1",
+    "scikit-learn>=1.5.2",
 ]
 
 [project.optional-dependencies]

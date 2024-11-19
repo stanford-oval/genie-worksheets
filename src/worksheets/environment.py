@@ -7,7 +7,7 @@ import tokenize
 from copy import deepcopy
 from enum import Enum
 from functools import partial
-from typing import Any, Callable
+from typing import Any
 
 from bs4 import BeautifulSoup
 from loguru import logger
@@ -315,7 +315,6 @@ class GenieField:
         self._value = self.init_value(value)
 
     def init_value(self, value):
-
         def previous_action_contains_confirm():
             """Only allow confirmation if the previous action was a confirmation action."""
             if self.bot.dlg_history is not None and len(self.bot.dlg_history):
@@ -827,7 +826,7 @@ class Action:
         )
         code_ = f"__return = []\n{transformed_code}"
 
-        local_context.context[f"__return"] = None
+        local_context.context["__return"] = None
 
         # Execute the action code
         bot.execute(code_, local_context)
@@ -921,7 +920,7 @@ class GenieRuntime:
 
         for key in to_delete:
             del self.context.context[key]
-        self.dlg_history = None
+        self.dlg_history = []
         self.order_of_actions = []
 
     def add_worksheet(self, ws):
@@ -1090,7 +1089,7 @@ class GenieInterpreter:
         code = replace_undefined_variables(code, local_context, global_context).strip()
         try:
             return eval(code, global_context.context, local_context.context)
-        except (NameError, AttributeError) as e:
+        except (NameError, AttributeError):
             return False
 
 
@@ -1165,7 +1164,7 @@ def execute_query(
     # refactoring the developer written code
     code = modify_action_code(code, obj, bot, local_context)
     code_ = f"__return = {code}"
-    local_context.context[f"__return"] = None
+    local_context.context["__return"] = None
 
     bot.execute(code_, local_context)
 

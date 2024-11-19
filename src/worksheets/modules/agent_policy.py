@@ -226,7 +226,10 @@ def _code_execution_and_policy_generation(
 
 def discover_and_execute_ordered(bot):
     for var_name in reversed(bot.order_of_actions):
-        obj = bot.context.context[var_name]
+        obj = bot.context.context.get(var_name)
+        if obj is None:
+            bot.order_of_actions.remove(var_name)
+            continue
         if isinstance(obj, Answer):
             continue
         if hasattr(obj, "predicate"):

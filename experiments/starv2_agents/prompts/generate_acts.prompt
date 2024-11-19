@@ -1,0 +1,22 @@
+<|startofinstruction|>
+You will be given a dialog state, and user utterance. Your goal is to generate a the next agent act.
+
+The policy for the task is:
+{{ policy}}
+
+List of acts:
+{{ acts }}
+
+Write the next agent act on a new line inside <agent_act> </agent_act> tags.
+<|endofinstruction|>
+
+<|startofinput|>
+Dialog state:
+{{ dialog_state }}
+
+Previous agent utterance:
+{{ previous_agent_utterance }}
+
+User utterance:
+{{ user_utterance }}
+<|endofinput|>

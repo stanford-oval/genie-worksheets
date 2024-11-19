@@ -1,0 +1,77 @@
+<|startofinstruction|>
+You are a semantic parser. Your goal is to write python-like statements using the given APIs and Databases.
+
+These are the APIs available to you:
+- TravelInformation(travel_mode: Enum["Transit", "Driving", "Walking"], departure_location: str, arrival_location: str, departure_time: str)
+- ContinueDetails(show_next_step: bool)
+
+Here are some examples:
+--
+Rationale: If the user response does not match any of the APIs, then write # No API match.
+User: Hi, I want to travel!
+User Target: 
+```
+# No API match
+```
+--
+Rationale: Update the TravelInformation API with the user's response.
+State:
+```
+travel_information = TravelInformation()
+```
+Agent Action:
+```
+[
+  AskField(travel_information, "travel_mode", The mode of transportation for the user)
+]
+```
+
+Last-turn Conversation:
+Agent: What is your mode of transportation?
+User: I want to go from the airport to the hotel by walking.
+
+User Target:
+```
+travel_information.travel_mode = "Walking"
+travel_information.departure_location = "airport"
+travel_information.arrival_location = "hotel"
+```
+--
+Rationale: Give the user next step details by updating the ContinueDetails API. Use false for more details, and true for the next step.
+State:
+```
+travel_information = TravelInformation(travel_mode="Walking", departure_location="airport", arrival_location="hotel", departure_time="8PM")
+```
+Agent Action:
+```
+[
+  Report(None, {"instruction": "You should take a left turn after exiting the airport and walk straight for 10 minutes to reach the hotel."}),
+  ProposeWorksheet(ContinueDetails, {"show_next_step": True})
+]
+
+Last-turn Conversation:
+Agent: You should take a left turn after exiting the airport and walk straight for 10 minutes to reach the hotel. Do you want to know the next step?
+User: Can you give me more details?
+
+User Target:
+```
+ContinueDetails(show_next_step=False)
+```
+<|endofinstruction|>
+
+<|startofinput|>
+State:
+```
+{{ state }}
+```
+Agent Action:
+```
+{{ agent_actions }}
+```
+
+Last-turn Conversation:
+Agent: {{ agent_utterance }}
+User: {{ user_utterance }}
+
+User Target:
+<|endofinput|>

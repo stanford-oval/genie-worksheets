@@ -27,10 +27,10 @@ class Agent(BaseModel):
     api: list
 
     # knowledge configuration for the agent to run queries and respond to the user
-    knowledge_base: SUQLKnowledgeBase
+    knowledge_base: SUQLKnowledgeBase | None
 
     # semantic parser for knowledge queries
-    knowledge_parser: BaseSUQLParser
+    knowledge_parser: BaseSUQLParser | None
 
     def load_from_gsheet(self, gsheet_id: str):
         """Load the agent configuration from the google sheet.

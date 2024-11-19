@@ -9,6 +9,11 @@ from langchain.prompts import (
 )
 from langchain.schema import HumanMessage, StrOutputParser, SystemMessage
 from langchain_community.callbacks.manager import get_openai_callback
+from langchain_community.chat_models.azureml_endpoint import (
+    AzureMLChatOnlineEndpoint,
+    AzureMLEndpointApiType,
+    CustomOpenAIChatContentFormatter,
+)
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from langchain_together import ChatTogether
 from loguru import logger
@@ -29,10 +34,17 @@ USER_EXAMPLE_END = "<|endofexampleuser|>"
 AI_EXAMPLE_START = "<|startofexampleai|>"
 AI_EXAMPLE_END = "<|endofexampleai|>"
 
-config_params = {
+azure_config_params = {
     "api_key": os.getenv("AZURE_OPENAI_WS_KEY"),
     "azure_endpoint": os.getenv("AZURE_WS_ENDPOINT"),
     "api_version": os.getenv("AZURE_WS_API_VERSION"),
+}
+
+llama_config_params = {
+    "endpoint_api_key": os.getenv("AZURE_LLAMA_KEY"),
+    "endpoint_url": os.getenv("AZURE_LLAMA_ENDPOINT"),
+    "endpoint_api_type": AzureMLEndpointApiType.serverless,
+    "content_formatter": CustomOpenAIChatContentFormatter(),
 }
 
 
@@ -103,13 +115,20 @@ async def llm_generate(
         llm = AzureChatOpenAI(
             azure_deployment=model_name.replace("azure/", ""),
             streaming=stream,
-            **config_params,
+            **azure_config_params,
             **llm_params,
         )
     elif "together" in model_name:
         llm = ChatTogether(
             model=model_name.replace("together/", ""),
             streaming=stream,
+            **llm_params,
+        )
+    elif "llama" in model_name:
+        llm = AzureMLChatOnlineEndpoint(
+            deployment_name=model_name.replace("llama/", ""),
+            streaming=stream,
+            **llama_config_params,
             **llm_params,
         )
     else:

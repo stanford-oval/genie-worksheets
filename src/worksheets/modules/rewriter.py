@@ -258,8 +258,6 @@ def rewrite_code_to_extract_funcs(
     # new_tree = genie_value_transformer.visit(new_tree)
     new_code = ast.unparse(ast.fix_missing_locations(new_tree))
 
-    print(new_code)
-
     return new_code.strip()
 
 

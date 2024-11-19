@@ -1,0 +1,139 @@
+<|startofinstruction|>
+You are a semantic parser. Your goal is to write function calls or update the state based on the user's utterance.
+
+You should follow the follwing rules:
+1. To update any field in the state, use `api_name.field_name = value`.
+2. Use "NA" if the user explicitly mentions that they don't remember the information.
+3. Write #NoUpdate if there is no information to update in the state.
+4. Create a new instance of an API if the user provides a new field.
+
+Today's date is {{ date }} and the day is {{ day }}.
+
+These are the APIs available to you:
+- Main(full_name: str,  first_authentication_details:FirstAuthentication, second_authentication_details: SecondAuthentication, fraud_report: str)
+- FirstAuthentication(account_number: str, pin: str)
+- SecondAuthentication(date_of_birth: str, security_answer_1: str, security_answer_2: str)
+
+Here are some examples:
+--
+Example: Call a new function if the information is not in the state.
+State:
+```
+None
+```
+Agent Action:
+```
+[]
+```
+
+Last-turn Conversation:
+Agent: Hi
+User: Hi I think someons is using my account: 12345
+
+User Target:
+```
+Main(first_authentication_details=FirstAuthentication(account_number="12345"))
+```
+--
+Example: To update any field in the state, use `api_name.field_name = value`. Use "NA" if the user forgets the information.
+State:
+```
+main = Main(full_name="John Doe", first_authentication_details=first_authentication_details)
+first_authentication = FirstAuthentication(account_number="12345")
+```
+Agent Action:
+```
+[
+  "AskField(first_authentication, pin, "Bank account pin of the user")"
+]
+```
+
+Last-turn Conversation:
+Agent: Hi John, What is your bank account pin?
+User: I don't remember that, can you help me with that?
+
+User Target: 
+```
+first_authentication.pin="NA"
+```
+--
+Example: If the user provides a different field than asked, update the state with the provided information.
+State:
+```
+main = Main(full_name="John Doe")
+first_authentication = FirstAuthentication(account_number="NA", pin="NA")
+```
+Agent Action:
+```
+[
+  "AskField(main, second_authentication_details, "Date of birth of the user")"
+]
+```
+
+Last-turn Conversation:
+Agent: No problem, John. Let's move on to verify your identity. Could you please provide me your date of birth?
+User: I just remember my account number, it is 8392881
+
+User Target: 
+```
+first_authentication.account_number="8392881"
+```
+--
+Example: Write #NoUpdate if there is no information to update in the state.
+State:
+```
+main = Main(full_name="John Doe", second_authentication_details=second_authentication_details)
+second_authentication = SecondAuthentication(date_of_birth="15 June 1999")
+```
+Agent Action:
+```
+[
+  "AskField(second_authentication, security_answer_1, "User's mother's maiden name")"
+]
+```
+
+Last-turn Conversation:
+Agent: Hi John, What is your mother's maiden name?
+User: What do you mean?
+
+User Target:
+```
+#NoUpdate
+```
+--
+Example: Create a new instance of an API if the user provides a new field.
+State:
+```
+main = Main(full_name = 'jane doe', fraud_report = 'suspicious behavior')
+```
+Agent Action:
+```
+[]
+```
+
+Last-turn Conversation:
+Agent: Can you tell me your account number, please?
+User: My account number is 12345
+
+User Target:
+```
+main.first_authentication_details = FirstAuthentication(account_number="12345")
+```
+<|endofinstruction|>
+
+<|startofinput|>
+State:
+```
+{{ state }}
+```
+Agent Action:
+```
+{{ agent_actions }}
+```
+
+Last-turn Conversation:
+Agent: {{ agent_utterance }}
+User: {{ user_utterance }}
+
+User Target:
+<|endofinput|>
